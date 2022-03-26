@@ -25,22 +25,22 @@ local PREFIX = "ArenaCountDown v"
 ---------------------------
 
 local MAJOR, MINOR = "ArenaCountDown", 1
-local ArenaCountDown = LibStub:NewLibrary(MAJOR, MINOR)
+local Core = LibStub:NewLibrary(MAJOR, MINOR)
 local L
-ArenaCountDown.version_major_num = 1
-ArenaCountDown.version_minor_num = 0.00
-ArenaCountDown.version_num = ArenaCountDown.version_major_num + ArenaCountDown.version_minor_num
-ArenaCountDown.version_releaseType = RELEASE_TYPES.release
-ArenaCountDown.version = PREFIX .. string.format("%.2f", ArenaCountDown.version_num) .. "-" .. ArenaCountDown.version_releaseType
+Core.version_major_num = 1
+Core.version_minor_num = 0.00
+Core.version_num = Core.version_major_num + Core.version_minor_num
+Core.version_releaseType = RELEASE_TYPES.release
+Core.version = PREFIX .. string.format("%.2f", Core.version_num) .. "-" .. Core.version_releaseType
 
-ArenaCountDown.modules = {}
-setmetatable(ArenaCountDown, {
+Core.modules = {}
+setmetatable(Core, {
     __tostring = function()
         return MAJOR
     end
 })
 
-function ArenaCountDown:Print(...)
+function Core:Print(...)
     local text = "|cff0384fcArenaCountDown|r:"
     local val
     for i = 1, select("#", ...) do
@@ -51,7 +51,7 @@ function ArenaCountDown:Print(...)
     DEFAULT_CHAT_FRAME:AddMessage(text)
 end
 
-function ArenaCountDown:Warn(...)
+function Core:Warn(...)
     local text = "|cfff29f05ArenaCountDown|r:"
     local val
     for i = 1, select("#", ...) do
@@ -62,7 +62,7 @@ function ArenaCountDown:Warn(...)
     DEFAULT_CHAT_FRAME:AddMessage(text)
 end
 
-function ArenaCountDown:Error(...)
+function Core:Error(...)
     local text = "|cfffc0303ArenaCountDown|r:"
     local val
     for i = 1, select("#", ...) do
@@ -73,24 +73,24 @@ function ArenaCountDown:Error(...)
     DEFAULT_CHAT_FRAME:AddMessage(text)
 end
 
-function ArenaCountDown:Debug(lvl, ...)
-    if ArenaCountDown.debug then
+function Core:Debug(lvl, ...)
+    if Core.debug then
         if lvl == "INFO" then
-            ArenaCountDown:Print(...)
+            Core:Print(...)
         elseif lvl == "WARN" then
-            ArenaCountDown:Warn(...)
+            Core:Warn(...)
         elseif lvl == "ERROR" then
-            ArenaCountDown:Error(...)
+            Core:Error(...)
         end
     end
 end
 
-ArenaCountDown.events = CreateFrame("Frame")
-ArenaCountDown.events.registered = {}
-ArenaCountDown.events:RegisterEvent("PLAYER_LOGIN")
-ArenaCountDown.events:SetScript("OnEvent", function(self, event, ...)
-    if (type(ArenaCountDown[event]) == "function") then
-        ArenaCountDown[event](ArenaCountDown, ...)
+Core.events = CreateFrame("Frame")
+Core.events.registered = {}
+Core.events:RegisterEvent("PLAYER_LOGIN")
+Core.events:SetScript("OnEvent", function(self, event, ...)
+    if (type(Core[event]) == "function") then
+        Core[event](Core, ...)
     end
 end)
 
@@ -120,11 +120,11 @@ local function pairsByPrio(t)
         end
     end
 end
-function ArenaCountDown:IterModules()
+function Core:IterModules()
     return pairsByPrio(self.modules)
 end
 
-function ArenaCountDown:Call(module, func, ...)
+function Core:Call(module, func, ...)
     if (type(module) == "string") then
         module = self.modules[module]
     end
@@ -133,13 +133,13 @@ function ArenaCountDown:Call(module, func, ...)
         module[func](module, ...)
     end
 end
-function ArenaCountDown:SendMessage(message, ...)
+function Core:SendMessage(message, ...)
     for _, module in self:IterModules() do
         self:Call(module, module.messages[message], ...)
     end
 end
 
-function ArenaCountDown:NewModule(name, priority, defaults)
+function Core:NewModule(name, priority, defaults)
     local module = CreateFrame("Frame")
     module.name = name
     module.priority = priority or 0
@@ -191,31 +191,31 @@ end
 
 ---------------------------
 
-function ArenaCountDown:DeleteUnknownOptions(tbl, refTbl, str)
+function Core:DeleteUnknownOptions(tbl, refTbl, str)
     if str == nil then
         str = "ArenaCountDown.db"
     end
     for k,v in pairs(tbl) do
         if refTbl[k] == nil then
-            ArenaCountDown:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, "not found!")
+            Core:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, "not found!")
             tbl[k] = nil
         else
             if type(v) ~= type(refTbl[k]) then
-                ArenaCountDown:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, "type error!", "Expected", type(refTbl[k]), "but found", type(v))
+                Core:Debug("INFO", "SavedVariable deleted:", str .. "." .. k, "type error!", "Expected", type(refTbl[k]), "but found", type(v))
                 tbl[k] = nil
             elseif type(v) == "table" then
-                ArenaCountDown:DeleteUnknownOptions(v, refTbl[k], str .. "." .. k)
+                Core:DeleteUnknownOptions(v, refTbl[k], str .. "." .. k)
             end
         end
     end
 end
 
-function ArenaCountDown:OnInitialize()
+function Core:OnInitialize()
     if IsAddOnLoaded("Gladdy") and LibStub("Gladdy").db.countdown then
         self:Error("not loaded because Gladdy's ArenaCountDown is enabled")
         return
     end
-    self:Print("version", string.format("%.2f", ArenaCountDown.version_num) .. "-" .. ArenaCountDown.version_releaseType, "loaded.")
+    self:Print("version", string.format("%.2f", Core.version_num) .. "-" .. Core.version_releaseType, "loaded.")
 
     self.dbi = LibStub("AceDB-3.0"):New("ACDXZ", self.defaults)
     self.dbi.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
@@ -232,31 +232,31 @@ function ArenaCountDown:OnInitialize()
     end
 end
 
-function ArenaCountDown:OnProfileReset()
+function Core:OnProfileReset()
     self.db = self.dbi.profile
     LibStub("AceConfigRegistry-3.0"):NotifyChange("ArenaCountDown")
 end
 
-function ArenaCountDown:OnProfileChanged()
+function Core:OnProfileChanged()
     self.db = self.dbi.profile
     LibStub("AceConfigRegistry-3.0"):NotifyChange("ArenaCountDown")
 end
 
-function ArenaCountDown:OnEnable()
+function Core:OnEnable()
     self:RegisterEvent("UPDATE_BATTLEFIELD_STATUS")
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
     self:RegisterEvent("PLAYER_REGEN_ENABLED")
 end
 
-function ArenaCountDown:RegisterEvent(event, func)
+function Core:RegisterEvent(event, func)
     self.events.registered[event] = func or event
     self.events:RegisterEvent(event)
 end
-function ArenaCountDown:UnregisterEvent(event)
+function Core:UnregisterEvent(event)
     self.events.registered[event] = nil
     self.events:UnregisterEvent(event)
 end
-function ArenaCountDown:UnregisterAllEvents()
+function Core:UnregisterAllEvents()
     self.events.registered = {}
     self.events:UnregisterAllEvents()
 end
@@ -267,23 +267,23 @@ end
 
 ---------------------------
 
-function ArenaCountDown:PLAYER_LOGIN()
+function Core:PLAYER_LOGIN()
     self:OnInitialize()
     self:OnEnable()
 end
 
-function ArenaCountDown:PLAYER_LOGOUT()
+function Core:PLAYER_LOGOUT()
     self:DeleteUnknownOptions(self.db, self.defaults.profile)
 end
 
-function ArenaCountDown:PLAYER_ENTERING_WORLD()
+function Core:PLAYER_ENTERING_WORLD()
 
 end
 
-function ArenaCountDown:UPDATE_BATTLEFIELD_STATUS(_, index)
+function Core:UPDATE_BATTLEFIELD_STATUS(_, index)
     local status, mapName, instanceID, levelRangeMin, levelRangeMax, teamSize, isRankedArena, suspendedQueue, bool, queueType = GetBattlefieldStatus(index)
     local instanceType = select(2, IsInInstance())
-    ArenaCountDown:Debug("INFO", "UPDATE_BATTLEFIELD_STATUS", instanceType, status, teamSize)
+    Core:Debug("INFO", "UPDATE_BATTLEFIELD_STATUS", instanceType, status, teamSize)
     if ((instanceType == "arena" or GetNumArenaOpponents() > 0) and status == "active" and teamSize > 0) then
         self.curBracket = teamSize
         self:JoinedArena()
@@ -296,7 +296,7 @@ end
 
 ---------------------------
 
-function ArenaCountDown:JoinedArena()
+function Core:JoinedArena()
     self:SendMessage("JOINED_ARENA")
 end
 
@@ -306,7 +306,7 @@ end
 
 ---------------------------
 
-function ArenaCountDown:Reset()
+function Core:Reset()
     for _, module in self:IterModules() do
         self:Call(module, "Reset")
     end
@@ -318,7 +318,7 @@ end
 
 ---------------------------
 
-function ArenaCountDown:Test()
+function Core:Test()
     self.testing = true
     for _, module in self:IterModules() do
         self:Call(module, "TestOnce")

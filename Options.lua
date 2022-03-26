@@ -1,22 +1,22 @@
 local type, pairs, tinsert, tsort = type, pairs, table.insert, table.sort
 
-local ArenaCountDown = LibStub("ArenaCountDown")
-local L = ArenaCountDown.L
+local Core = LibStub("ArenaCountDown")
+local L = Core.L
 
-ArenaCountDown.defaults = {
+Core.defaults = {
     profile = {},
 }
 
-function ArenaCountDown:option(params)
+function Core:option(params)
     local defaults = {
         get = function(info)
             local key = info.arg or info[#info]
-            return ArenaCountDown.dbi.profile[key]
+            return Core.dbi.profile[key]
         end,
         set = function(info, value)
             local key = info.arg or info[#info]
-            ArenaCountDown.dbi.profile[key] = value
-            ArenaCountDown:UpdateFrame()
+            Core.dbi.profile[key] = value
+            Core:UpdateFrame()
         end,
     }
 
@@ -29,15 +29,15 @@ end
 
 local function getOpt(info)
     local key = info.arg or info[#info]
-    return ArenaCountDown.dbi.profile[key]
+    return Core.dbi.profile[key]
 end
 local function setOpt(info, value)
     local key = info.arg or info[#info]
-    ArenaCountDown.dbi.profile[key] = value
-    ArenaCountDown:UpdateFrame()
+    Core.dbi.profile[key] = value
+    Core:UpdateFrame()
 end
 
-function ArenaCountDown:UpdateFrame()
+function Core:UpdateFrame()
     for _, v in self:IterModules() do
         self:Call(v, "UpdateFrame")
     end
@@ -46,7 +46,7 @@ function ArenaCountDown:UpdateFrame()
     end
 end
 
-function ArenaCountDown:SetupModule(name, module, order)
+function Core:SetupModule(name, module, order)
     local options = module:GetOptions()
     if options then
         self.options.args[name] = {
@@ -70,8 +70,8 @@ function ArenaCountDown:SetupModule(name, module, order)
                         self.dbi.profile[k] = v
                     end
 
-                    ArenaCountDown:UpdateFrame()
-                    ArenaCountDown:SetupModule(name, module, order) -- For example click names are not reset by default
+                    Core:UpdateFrame()
+                    Core:SetupModule(name, module, order) -- For example click names are not reset by default
                 end
             }
         else
@@ -104,11 +104,11 @@ local function pairsByKeys(t)
     end
 end
 
-function ArenaCountDown:ShowOptions()
+function Core:ShowOptions()
     InterfaceOptionsFrame_OpenToFrame("ArenaCountDown")
 end
 
-function ArenaCountDown:SetupOptions()
+function Core:SetupOptions()
     self.options = {
         type = "group",
         name = L["ArenaCountDown"],
@@ -124,7 +124,7 @@ function ArenaCountDown:SetupOptions()
                 desc = L["Show Test frames"],
                 type = "execute",
                 func = function()
-                    ArenaCountDown:Test()
+                    Core:Test()
                 end,
             },
             hide = {
@@ -134,7 +134,7 @@ function ArenaCountDown:SetupOptions()
                 desc = L["Hide frames"],
                 type = "execute",
                 func = function()
-                    ArenaCountDown:Reset()
+                    Core:Reset()
                 end,
             },
             reload = {
@@ -151,7 +151,7 @@ function ArenaCountDown:SetupOptions()
                 order = 5,
                 width = 1,
                 type = "description",
-                name = "     " .. ArenaCountDown.version
+                name = Core.version
             },
         },
     }

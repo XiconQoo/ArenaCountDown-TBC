@@ -8,7 +8,7 @@
 ## OptionalDeps: Gladdy
 
 embeds.xml
-ArenaCountDown.lua
+Core.lua
 Lang.lua
 Options.lua
 
