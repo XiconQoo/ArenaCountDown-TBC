@@ -27,6 +27,8 @@ local PREFIX = "ArenaCountDown v"
 local MAJOR, MINOR = "ArenaCountDown", 1
 local Core = LibStub:NewLibrary(MAJOR, MINOR)
 local L
+Core.debug = false
+
 Core.version_major_num = 1
 Core.version_minor_num = 0.00
 Core.version_num = Core.version_major_num + Core.version_minor_num
@@ -280,7 +282,7 @@ function Core:PLAYER_ENTERING_WORLD()
 
 end
 
-function Core:UPDATE_BATTLEFIELD_STATUS(_, index)
+function Core:UPDATE_BATTLEFIELD_STATUS(index)
     local status, mapName, instanceID, levelRangeMin, levelRangeMax, teamSize, isRankedArena, suspendedQueue, bool, queueType = GetBattlefieldStatus(index)
     local instanceType = select(2, IsInInstance())
     Core:Debug("INFO", "UPDATE_BATTLEFIELD_STATUS", instanceType, status, teamSize)
