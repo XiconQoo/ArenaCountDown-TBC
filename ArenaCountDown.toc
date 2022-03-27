@@ -1,6 +1,6 @@
 ## Interface: 20504
 ## Title: ArenaCountDown
-## Version: 1.00-Release
+## Version: 1.01-Release
 ## Notes: ArenaCountDown
 ## Author: XiconQoo, DnB_Junkee, Knall
 ## X-Email: contact me on discord Knall#1751
